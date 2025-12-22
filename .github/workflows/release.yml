@@ -39,3 +39,5 @@ jobs:
             conventional-changelog-conventionalcommits
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
+          REGISTRY: ghcr.io
+          HELM_REGISTRY_CONFIG: ${{ env.DOCKER_CONFIG }}/config.json
