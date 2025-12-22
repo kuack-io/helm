@@ -40,9 +40,8 @@ jobs:
         uses: pre-commit/action@v3.0.1
 
   lint:
-    name: Chart Lint
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+    name: Lint
+    runs-on: ubuntu-latest # runs in all pipelines, on main to update the cache used in PRs
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -52,6 +51,11 @@ jobs:
         uses: azure/setup-helm@v4
         with:
           version: v3.14.0
+      - name: Cache chart-testing pip deps
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/pip
+          key: chart-testing-pip-${{ runner.os }}-${{ hashFiles('ct.yaml') }}
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
       - name: Run chart-testing (lint)
