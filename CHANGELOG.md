@@ -1,3 +1,9 @@
+## [1.0.7](https://github.com/kuack-io/helm/compare/v1.0.6...v1.0.7) (2025-12-22)
+
+### Bug Fixes
+
+* do not override node entrypoint ([8f742ee](https://github.com/kuack-io/helm/commit/8f742eeeca06055c48b4c0620a436aefb7b6659d))
+
 ## [1.0.6](https://github.com/kuack-io/helm/compare/v1.0.5...v1.0.6) (2025-12-22)
 
 ### Bug Fixes
