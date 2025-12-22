@@ -23,7 +23,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- if .Values.node.configMap.create }}
-        checksum/config: {{ include "kuack-node/templates/node/configmap.yaml" . | sha256sum }}
+        checksum/config: {{ include "kuack-node.configMapData" . | sha256sum }}
         {{- end }}
       labels:
         {{- include "kuack-node.selectorLabels" . | nindent 8 }}
