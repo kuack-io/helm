@@ -1,3 +1,12 @@
+## [1.0.4](https://github.com/kuack-io/helm/compare/v1.0.3...v1.0.4) (2025-12-22)
+
+### Dependencies
+
+* **deps-dev:** bump @semantic-release/exec from 6.0.3 to 7.1.0 ([436273f](https://github.com/kuack-io/helm/commit/436273f38740d2110283d7d17441b2f9b29ab7fa))
+* **deps-dev:** bump semantic-release from 23.1.1 to 25.0.2 ([85bd920](https://github.com/kuack-io/helm/commit/85bd920afaf5c791756cc56eb8f2566b9c3b86b7))
+* **deps:** bump actions/setup-python from 5 to 6 ([28c93d0](https://github.com/kuack-io/helm/commit/28c93d05de9d3fc6b6e7b70cde78d93e21405785))
+* **deps:** bump helm/chart-testing-action from 2.6.1 to 2.8.0 ([381d480](https://github.com/kuack-io/helm/commit/381d480eeab13126d32d4ba2d9c1f3fad4b3ecd2))
+
 ## [1.0.3](https://github.com/kuack-io/helm/compare/v1.0.2...v1.0.3) (2025-12-22)
 
 ### Bug Fixes
