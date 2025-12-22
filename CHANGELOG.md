@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/kuack-io/helm/compare/v1.0.0...v1.0.1) (2025-12-22)
+
+### Dependencies
+
+* **deps-dev:** bump @semantic-release/github from 10.3.5 to 12.0.2 ([e2472f7](https://github.com/kuack-io/helm/commit/e2472f7e139e5751e0b3e7c61aea2972d6c1f1b6))
+
 ## 1.0.0 (2025-12-22)
 
 ### Features
