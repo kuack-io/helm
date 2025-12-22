@@ -132,7 +132,7 @@ Properly handles registry:port/repository:tag format
   {{- else if regexMatch ".*/.+:.+$" $repo -}}
     {{- $repo -}}
   {{- else -}}
-    {{- printf "%s:%s" $repo .Chart.AppVersion -}}
+    {{- printf "%s:%s" $repo "latest" -}}
   {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -160,7 +160,7 @@ Properly handles registry:port/repository:tag format
   {{- else if regexMatch ".*/.+:.+$" $repo -}}
     {{- $repo -}}
   {{- else -}}
-    {{- printf "%s:%s" $repo .Chart.AppVersion -}}
+    {{- printf "%s:%s" $repo "latest" -}}
   {{- end -}}
 {{- end -}}
 {{- end -}}

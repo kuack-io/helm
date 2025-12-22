@@ -11,7 +11,7 @@ node:
   image:
     repository: ghcr.io/kuack-io/node
     pullPolicy: Always
-    # tag defaults to Chart.AppVersion if not specified
+    # tag defaults to "latest" if not specified
     tag: ""
     # Optional: Use image digest instead of tag for immutability
     # Format: sha256:abc123...
@@ -184,7 +184,7 @@ agent:
   image:
     repository: ghcr.io/kuack-io/agent
     pullPolicy: Always
-    # tag defaults to Chart.AppVersion if not specified
+    # tag defaults to "latest" if not specified
     tag: ""
     # Optional: Use image digest instead of tag for immutability
     # Format: sha256:abc123...

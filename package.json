@@ -46,7 +46,7 @@
       [
         "@semantic-release/exec",
         {
-          "prepareCmd": "sed -i 's/^version: .*/version: ${nextRelease.version}/' Chart.yaml && sed -i 's/^appVersion: .*/appVersion: \"${nextRelease.version}\"/' Chart.yaml && helm package .",
+          "prepareCmd": "sed -i 's/^version: .*/version: ${nextRelease.version}/' Chart.yaml && helm package .",
           "publishCmd": "helm push kuack-${nextRelease.version}.tgz oci://ghcr.io/$GITHUB_REPOSITORY_OWNER/charts"
         }
       ],
