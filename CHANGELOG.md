@@ -1,3 +1,9 @@
+## [1.0.5](https://github.com/kuack-io/helm/compare/v1.0.4...v1.0.5) (2025-12-22)
+
+### Dependencies
+
+* **deps-dev:** bump conventional-changelog-conventionalcommits ([bc7c26d](https://github.com/kuack-io/helm/commit/bc7c26dff6ee603d26665a0a3554d06cd1a3d3ee))
+
 ## [1.0.4](https://github.com/kuack-io/helm/compare/v1.0.3...v1.0.4) (2025-12-22)
 
 ### Dependencies
