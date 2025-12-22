@@ -1,0 +1,28 @@
+misconfigurations:
+  # Virtual kubelet requires create/update/delete permissions on pods to manage pods scheduled to the virtual node.
+  # This is a fundamental requirement for virtual kubelet operation.
+  - id: AVD-KSV-0048
+    paths:
+      - "templates/node/rbac.yaml"
+  # Virtual kubelet requires read access to secrets for pod volumes.
+  # Pods scheduled to the virtual node may reference secrets from any namespace, requiring cluster-scoped read access.
+  - id: AVD-KSV-0041
+    paths:
+      - "templates/node/rbac.yaml"
+  # nginx requires write access to filesystem for logs and cache directories.
+  # The nginx-unprivileged image needs write access to /var/cache/nginx and /var/run.
+  - id: AVD-KSV-0014
+    paths:
+      - "templates/agent/deployment.yaml"
+  # nginx-unprivileged image runs as user ID 101 (nginx user).
+  # This is the standard user ID for nginx in the official nginx images and cannot be changed without rebuilding the image.
+  - id: AVD-KSV-0020
+    paths:
+      - "templates/agent/deployment.yaml"
+  # nginx-unprivileged image runs as group ID 101 (nginx group).
+  # This is the standard group ID for nginx in the official nginx images and cannot be changed without rebuilding the image.
+  - id: AVD-KSV-0021
+    paths:
+      - "templates/agent/deployment.yaml"
+  # ghcr.io is the trusted registry for this project.
+  - id: AVD-KSV-0125

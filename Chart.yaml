@@ -1,0 +1,18 @@
+apiVersion: v2
+name: kuack-node
+description: A Helm chart for Kuack - Virtual Kubelet provider for WASM workloads that enables scheduling Kubernetes pods to browser-based agents.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - virtual-kubelet
+  - wasm
+  - kubernetes
+  - kuack
+home: https://kuack.io
+sources:
+  - https://github.com/kuack-io/helm
+maintainers:
+  - name: kuack-io
+    email: konstantin@kuack.io
+    url: https://kuack.io

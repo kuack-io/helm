@@ -1,0 +1,106 @@
+{{- if and .Values.node.enabled .Values.node.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kuack-node.fullname" . }}
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+rules:
+  # Nodes: Virtual Kubelet needs to create and manage its virtual node
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  # Nodes/status: Virtual Kubelet needs to update node status
+  - apiGroups:
+      - ""
+    resources:
+      - nodes/status
+    verbs:
+      - get
+      - update
+      - patch
+  # Pods: Virtual Kubelet needs to manage pods scheduled to it
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  # Pods/status: Virtual Kubelet needs to update pod status
+  - apiGroups:
+      - ""
+    resources:
+      - pods/status
+    verbs:
+      - get
+      - update
+      - patch
+  # Pods/binding: Virtual Kubelet needs to bind pods
+  - apiGroups:
+      - ""
+    resources:
+      - pods/binding
+    verbs:
+      - create
+  # Events: Virtual Kubelet may create events
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - update
+  # ConfigMaps and Secrets: For pod volumes
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  # Services: For pod networking and service injection
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  {{- with .Values.node.rbac.extraRules }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "kuack-node.fullname" . }}
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "kuack-node.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kuack-node.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

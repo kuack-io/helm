@@ -1,0 +1,98 @@
+{{- if .Values.agent.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kuack-agent.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-agent.labels" . | nindent 4 }}
+  annotations:
+    checkov.io/skip1: CKV_K8S_43=Image digests are optional in Helm charts for flexibility. Users can provide image.digest in values.yaml if they require immutability.
+    checkov.io/skip2: CKV_K8S_40=Agent runs as nginx user (UID 101) which is standard for nginx-unprivileged image. This cannot be changed without rebuilding the image.
+    checkov.io/skip3: CKV_K8S_22=nginx requires write access to filesystem for logs and cache directories. The nginx-unprivileged image needs write access to /var/cache/nginx and /var/run.
+spec:
+  replicas: {{ .Values.agent.replicas }}
+  selector:
+    matchLabels:
+      {{- include "kuack-agent.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.agent.pod.annotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "kuack-agent.selectorLabels" . | nindent 8 }}
+        {{- with .Values.agent.pod.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kuack-agent.serviceAccountName" . }}
+      {{- if eq .Values.agent.serviceAccount.automountServiceAccountToken false }}
+      automountServiceAccountToken: false
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.agent.pod.securityContext | nindent 8 }}
+      containers:
+      - name: kuack-agent
+        image: {{ include "kuack-agent.image" . | quote }}
+        imagePullPolicy: {{ .Values.agent.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.agent.service.port }}
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.agent.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.agent.pod.containerSecurityContext | nindent 10 }}
+        volumeMounts:
+        # nginx needs write access to temp directories
+        - name: tmp
+          mountPath: /tmp
+        - name: nginx-cache
+          mountPath: /var/cache/nginx
+        - name: nginx-run
+          mountPath: /var/run
+        {{- if .Values.agent.probes.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.agent.probes.livenessProbe.httpGet.path }}
+            port: {{ .Values.agent.service.port }}
+          initialDelaySeconds: {{ .Values.agent.probes.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.agent.probes.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.agent.probes.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.agent.probes.livenessProbe.failureThreshold }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.agent.probes.readinessProbe.httpGet.path }}
+            port: {{ .Values.agent.service.port }}
+          initialDelaySeconds: {{ .Values.agent.probes.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.agent.probes.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.agent.probes.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.agent.probes.readinessProbe.failureThreshold }}
+        {{- end }}
+      {{- with .Values.agent.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.agent.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.agent.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      # nginx needs write access to temp directories
+      - name: tmp
+        emptyDir: {}
+      - name: nginx-cache
+        emptyDir: {}
+      - name: nginx-run
+        emptyDir: {}
+{{- end }}

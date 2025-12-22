@@ -1,0 +1,30 @@
+{{- if and .Values.node.enabled .Values.node.service.create }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kuack-node.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+  {{- with .Values.node.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.node.service.type }}
+  ports:
+    - port: {{ .Values.node.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.node.service.kubeletPort }}
+      targetPort: kubelet
+      protocol: TCP
+      name: kubelet
+  selector:
+    {{- include "kuack-node.selectorLabels" . | nindent 4 }}
+  {{- with .Values.node.service.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

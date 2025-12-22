@@ -1,0 +1,3 @@
+helm-extra-args: --timeout 30s
+validate-maintainers: false
+target-branch: main

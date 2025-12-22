@@ -1,0 +1,16 @@
+.DS_Store
+.git/
+.gitignore
+.gitlab/
+.gitlab-ci.yml
+.checkovignore.yaml
+.pre-commit-config.yaml
+.trivyignore
+chart_schema.yaml
+commitlint.config.js
+ct.yaml
+lintconf.yaml
+README.md
+renovate.json
+.idea/
+.vscode/
