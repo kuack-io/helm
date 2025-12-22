@@ -57,7 +57,7 @@ jobs:
           path: ~/.cache/pip
           key: chart-testing-pip-${{ runner.os }}-${{ hashFiles('ct.yaml') }}
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.6.1
+        uses: helm/chart-testing-action@v2.8.0
       - name: Run chart-testing (lint)
         run: ct lint --config ct.yaml --charts .
 
