@@ -1,0 +1,19 @@
+{{- if and .Values.node.enabled .Values.node.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "kuack-node.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.node.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.node.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.node.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.node.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "kuack-node.selectorLabels" . | nindent 6 }}
+{{- end }}

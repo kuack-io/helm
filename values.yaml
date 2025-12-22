@@ -1,0 +1,311 @@
+# Default values for kuack
+# This is a YAML-formatted file.
+
+# Global image pull secrets (optional)
+imagePullSecrets: []
+
+# Node component configuration
+node:
+  enabled: true
+  # Image configuration
+  image:
+    repository: ghcr.io/kuack-io/node
+    pullPolicy: Always
+    # tag defaults to Chart.AppVersion if not specified
+    tag: ""
+    # Optional: Use image digest instead of tag for immutability
+    # Format: sha256:abc123...
+    digest: ""
+
+  # Service account configuration
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+    # Automount service account token
+    # Set to false if the pod doesn't need to access the Kubernetes API
+    automountServiceAccountToken: true
+
+  # RBAC configuration
+  rbac:
+    # Specifies whether RBAC resources should be created
+    create: true
+    # Additional ClusterRole rules
+    extraRules: []
+
+  # Node configuration
+  config:
+    # Name of the virtual node
+    name: "kuack-node"
+    # Disable the default taint on the node
+    disableTaint: false
+
+  # HTTP server configuration
+  http:
+    # Listen address for HTTP server
+    listenAddr: ":8080"
+
+  # ConfigMap configuration
+  configMap:
+    # Specifies whether a ConfigMap should be created
+    create: true
+
+  # Kubernetes client configuration
+  kubeconfig:
+    # Path to kubeconfig file (leave empty for in-cluster config)
+    path: ""
+
+  # Pod configuration
+  pod:
+    # Annotations to add to the pod
+    annotations: {}
+    # Labels to add to the pod
+    labels: {}
+    # Security context for the pod
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 65532
+      fsGroup: 65532
+    # Container security context
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      runAsGroup: 65532
+      seccompProfile:
+        type: RuntimeDefault
+      capabilities:
+        drop:
+          - ALL
+    # Temporary directory for read-only filesystem
+    # If readOnlyRootFilesystem is true, mount an emptyDir volume here
+    tmpDir:
+      enabled: true
+      mountPath: /tmp
+
+  # Resource limits and requests
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # Node selector
+  nodeSelector: {}
+
+  # Tolerations
+  tolerations: []
+
+  # Affinity rules
+  affinity: {}
+
+  # Service configuration
+  service:
+    # Specifies whether a service should be created
+    create: true
+    type: ClusterIP
+    # Port for HTTP server (TCP)
+    httpPort: 8080
+    # Port for kubelet endpoint (TCP, standard port)
+    kubeletPort: 10250
+    annotations: {}
+    labels: {}
+
+  # Ingress configuration
+  ingress:
+    # Specifies whether an ingress should be created
+    create: false
+    # Ingress class name (leave empty for default)
+    className: ""
+    # Service port to use for ingress backend (defaults to httpPort)
+    port: null  # null = use httpPort, or specify kubeletPort for health checks
+    # Ingress annotations
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Hosts configuration
+    hosts:
+      - host: kuack-node.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    # TLS configuration
+    tls: []
+      # - secretName: kuack-node-tls
+      #   hosts:
+      #     - kuack-node.example.com
+    # HTTP/HTTPS is fully supported by standard Kubernetes Ingress.
+
+  # Logging configuration
+  logging:
+    # klog verbosity level (0-10)
+    verbosity: 2
+
+  runtimeClass:
+    enabled: true
+    name: "kuack-edge"
+    handler: "virtual-kuack"
+    nodeSelector:
+      type: virtual-kubelet
+    tolerations:
+      - key: "virtual-kubelet.io/provider"
+        operator: "Equal"
+        value: "wasm"
+        effect: "NoSchedule"
+
+  # Pod disruption budget
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+
+  # NetworkPolicy configuration
+  networkPolicy:
+    # Specifies whether a NetworkPolicy should be created
+    enabled: true
+    # Custom ingress rules (if not specified, defaults are used)
+    ingress: []
+    # Custom egress rules (if not specified, all egress is allowed)
+    egress: []
+
+  # Liveness and readiness probes
+  probes:
+    enabled: true
+    # Note: Probes use TCP socket checks on the kubelet port
+
+# Agent component configuration
+agent:
+  enabled: true
+  # Image configuration
+  image:
+    repository: ghcr.io/kuack-io/agent
+    pullPolicy: Always
+    # tag defaults to Chart.AppVersion if not specified
+    tag: ""
+    # Optional: Use image digest instead of tag for immutability
+    # Format: sha256:abc123...
+    digest: ""
+
+  # Service account configuration
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+    # Automount service account token
+    # Set to false if the pod doesn't need to access the Kubernetes API
+    automountServiceAccountToken: false
+
+  # Pod configuration
+  pod:
+    # Annotations to add to the pod
+    annotations: {}
+    # Labels to add to the pod
+    labels: {}
+    # Security context for the pod
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 101  # nginx user ID
+      fsGroup: 101
+    # Container security context
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: false  # nginx needs write access for logs
+      runAsGroup: 101
+      seccompProfile:
+        type: RuntimeDefault
+      capabilities:
+        drop:
+          - ALL
+
+  # Resource limits and requests
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  # Node selector
+  nodeSelector: {}
+
+  # Tolerations
+  tolerations: []
+
+  # Affinity rules
+  affinity: {}
+
+  # Replicas
+  replicas: 1
+
+  # Service configuration
+  service:
+    # Specifies whether a service should be created
+    create: true
+    type: ClusterIP
+    # Port for HTTP server (TCP)
+    port: 8080
+    annotations: {}
+    labels: {}
+
+  # Ingress configuration
+  ingress:
+    # Specifies whether an ingress should be created
+    create: false
+    # Ingress class name (leave empty for default)
+    className: ""
+    # Ingress annotations
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Hosts configuration
+    hosts:
+      - host: kuack-agent.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    # TLS configuration
+    tls: []
+      # - secretName: kuack-agent-tls
+      #   hosts:
+      #     - kuack-agent.example.com
+
+  # Pod disruption budget
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+
+  # NetworkPolicy configuration
+  networkPolicy:
+    # Specifies whether a NetworkPolicy should be created
+    enabled: true
+    # Custom ingress rules (if not specified, defaults are used)
+    ingress: []
+    # Custom egress rules (if not specified, all egress is allowed)
+    egress: []
+
+  # Liveness and readiness probes
+  probes:
+    enabled: true
+    livenessProbe:
+      httpGet:
+        path: /
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3

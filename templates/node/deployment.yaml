@@ -1,0 +1,131 @@
+{{- if .Values.node.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kuack-node.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+  annotations:
+    checkov.io/skip1: CKV_K8S_43=Image digests are optional in Helm charts for flexibility. Users can provide image.digest in values.yaml if they require immutability.
+    checkov.io/skip2: CKV_K8S_38=This virtual kubelet requires the service account token to interact with the Kubernetes API for node registration, pod scheduling, and resource management. The token is necessary for the application to function.
+spec:
+  {{- if not .Values.node.podDisruptionBudget.enabled }}
+  replicas: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "kuack-node.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.node.pod.annotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.node.configMap.create }}
+        checksum/config: {{ include "kuack-node/templates/node/configmap.yaml" . | sha256sum }}
+        {{- end }}
+      labels:
+        {{- include "kuack-node.selectorLabels" . | nindent 8 }}
+        {{- with .Values.node.pod.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kuack-node.serviceAccountName" . }}
+      {{- if eq .Values.node.serviceAccount.automountServiceAccountToken false }}
+      automountServiceAccountToken: false
+      {{- else }}
+      automountServiceAccountToken: true
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.node.pod.securityContext | nindent 8 }}
+      containers:
+      - name: kuack-node
+        image: {{ include "kuack-node.image" . | quote }}
+        imagePullPolicy: {{ .Values.node.image.pullPolicy }}
+        command:
+          - /kuack-node
+        ports:
+        - name: http
+          containerPort: {{ .Values.node.service.httpPort }}
+          protocol: TCP
+        - name: kubelet
+          containerPort: {{ .Values.node.service.kubeletPort }}
+          protocol: TCP
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        {{- if .Values.node.configMap.create }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "kuack-node.fullname" . }}-config
+        {{- else }}
+        # Environment variables when ConfigMap is not used
+        - name: NODE_NAME
+          value: {{ .Values.node.config.name | quote }}
+        - name: HTTP_LISTEN_ADDR
+          value: {{ .Values.node.http.listenAddr | quote }}
+        - name: DISABLE_TAINT
+          value: {{ .Values.node.config.disableTaint | quote }}
+        {{- if .Values.node.kubeconfig.path }}
+        - name: KUBECONFIG
+          value: {{ .Values.node.kubeconfig.path | quote }}
+        {{- end }}
+        - name: KLOG_VERBOSITY
+          value: {{ .Values.node.logging.verbosity | quote }}
+        {{- end }}
+        volumeMounts:
+        {{- if and .Values.node.pod.containerSecurityContext.readOnlyRootFilesystem .Values.node.pod.tmpDir.enabled }}
+        - name: tmp
+          mountPath: {{ .Values.node.pod.tmpDir.mountPath }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.node.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.node.pod.containerSecurityContext | nindent 10 }}
+        {{- if .Values.node.probes.enabled }}
+        # Note: Probes are disabled by default because the distroless image
+        # doesn't include shell utilities. If you need probes, use a different base image.
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.node.service.kubeletPort }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.node.service.kubeletPort }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        {{- end }}
+      volumes:
+      {{- if and .Values.node.pod.containerSecurityContext.readOnlyRootFilesystem .Values.node.pod.tmpDir.enabled }}
+      - name: tmp
+        emptyDir: {}
+      {{- end }}
+      {{- with .Values.node.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.node.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.node.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

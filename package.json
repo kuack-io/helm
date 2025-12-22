@@ -1,0 +1,41 @@
+{
+  "name": "kuack-helm",
+  "version": "0.0.0-development",
+  "private": true,
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^10.0.0",
+    "conventional-changelog-conventionalcommits": "^7.0.2",
+    "semantic-release": "^23.0.0"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "sed -i 's/^version: .*/version: ${nextRelease.version}/' Chart.yaml && sed -i 's/^appVersion: .*/appVersion: \"${nextRelease.version}\"/' Chart.yaml && helm package .",
+          "publishCmd": "helm push kuack-node-${nextRelease.version}.tgz oci://ghcr.io/${GITHUB_REPOSITORY_OWNER}/charts"
+        }
+      ],
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "Chart.yaml"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ],
+      "@semantic-release/github"
+    ]
+  }
+}

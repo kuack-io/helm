@@ -1,0 +1,26 @@
+{{- if and .Values.agent.enabled .Values.agent.service.create }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kuack-agent.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-agent.labels" . | nindent 4 }}
+  {{- with .Values.agent.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.agent.service.type }}
+  ports:
+    - port: {{ .Values.agent.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "kuack-agent.selectorLabels" . | nindent 4 }}
+  {{- with .Values.agent.service.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

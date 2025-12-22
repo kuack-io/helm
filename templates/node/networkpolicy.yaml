@@ -1,0 +1,48 @@
+{{- if and .Values.node.enabled .Values.node.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "kuack-node.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "kuack-node.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    {{- if .Values.node.networkPolicy.ingress }}
+    {{- toYaml .Values.node.networkPolicy.ingress | nindent 4 }}
+    {{- else }}
+    # Allow ingress from same namespace
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: {{ .Release.Namespace }}
+      ports:
+      - protocol: TCP
+        port: {{ .Values.node.service.kubeletPort }}
+      - protocol: TCP
+        port: {{ .Values.node.service.httpPort }}
+    # Allow ingress from kube-system namespace (for kubelet communication)
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+      ports:
+      - protocol: TCP
+        port: {{ .Values.node.service.kubeletPort }}
+      - protocol: TCP
+        port: {{ .Values.node.service.httpPort }}
+    {{- end }}
+  egress:
+    {{- if .Values.node.networkPolicy.egress }}
+    {{- toYaml .Values.node.networkPolicy.egress | nindent 4 }}
+    {{- else }}
+    # Allow all egress (required for kubelet API calls and HTTP connections)
+    - {}
+    {{- end }}
+{{- end }}

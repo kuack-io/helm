@@ -1,0 +1,17 @@
+{{- if and .Values.node.enabled .Values.node.configMap.create }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "kuack-node.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+data:
+  NODE_NAME: {{ .Values.node.config.name | quote }}
+  HTTP_LISTEN_ADDR: {{ .Values.node.http.listenAddr | quote }}
+  DISABLE_TAINT: {{ .Values.node.config.disableTaint | quote }}
+  {{- if .Values.node.kubeconfig.path }}
+  KUBECONFIG: {{ .Values.node.kubeconfig.path | quote }}
+  {{- end }}
+  KLOG_VERBOSITY: {{ .Values.node.logging.verbosity | quote }}
+{{- end }}
