@@ -1,3 +1,9 @@
+## [1.0.8](https://github.com/kuack-io/helm/compare/v1.0.7...v1.0.8) (2025-12-22)
+
+### Bug Fixes
+
+* remove v from release version ([c5d980f](https://github.com/kuack-io/helm/commit/c5d980ffc18686e768e4fe7d02b5341d25d73b0c))
+
 ## [1.0.7](https://github.com/kuack-io/helm/compare/v1.0.6...v1.0.7) (2025-12-22)
 
 ### Bug Fixes
