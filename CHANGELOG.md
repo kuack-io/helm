@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/kuack-io/helm/compare/v1.0.2...v1.0.3) (2025-12-22)
+
+### Bug Fixes
+
+* rename package ([8eb26d2](https://github.com/kuack-io/helm/commit/8eb26d28c4862c11d813e90caf621f0ba8af23ec))
+* wrong reference ([977b518](https://github.com/kuack-io/helm/commit/977b51899468fc9653d5e70b66cd59719efccfd5))
+
 ## [1.0.2](https://github.com/kuack-io/helm/compare/v1.0.1...v1.0.2) (2025-12-22)
 
 ### Bug Fixes
