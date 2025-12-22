@@ -40,14 +40,14 @@
       [
         "@semantic-release/changelog",
         {
-        "changelogFile": "CHANGELOG.md"
+          "changelogFile": "CHANGELOG.md"
         }
-    ],
+      ],
       [
         "@semantic-release/exec",
         {
           "prepareCmd": "sed -i 's/^version: .*/version: ${nextRelease.version}/' Chart.yaml && sed -i 's/^appVersion: .*/appVersion: \"${nextRelease.version}\"/' Chart.yaml && helm package .",
-          "publishCmd": "helm push kuack-node-${nextRelease.version}.tgz oci://ghcr.io/${GITHUB_REPOSITORY_OWNER}/charts"
+          "publishCmd": "helm push kuack-node-${nextRelease.version}.tgz oci://ghcr.io/$GITHUB_REPOSITORY_OWNER/charts"
         }
       ],
       [
