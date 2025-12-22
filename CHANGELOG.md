@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/kuack-io/helm/compare/v1.0.1...v1.0.2) (2025-12-22)
+
+### Bug Fixes
+
+* release issue ([f582e22](https://github.com/kuack-io/helm/commit/f582e22501bc591d9ef7e4826abb1c9bdf869156))
+
 ## [1.0.1](https://github.com/kuack-io/helm/compare/v1.0.0...v1.0.1) (2025-12-22)
 
 ### Dependencies
