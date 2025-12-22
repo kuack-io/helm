@@ -164,3 +164,17 @@ Properly handles registry:port/repository:tag format
   {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+ConfigMap data content for node component.
+Used for checksum calculation in deployment.
+*/}}
+{{- define "kuack-node.configMapData" -}}
+NODE_NAME: {{ .Values.node.config.name | quote }}
+HTTP_LISTEN_ADDR: {{ .Values.node.http.listenAddr | quote }}
+DISABLE_TAINT: {{ .Values.node.config.disableTaint | quote }}
+{{- if .Values.node.kubeconfig.path }}
+KUBECONFIG: {{ .Values.node.kubeconfig.path | quote }}
+{{- end }}
+KLOG_VERBOSITY: {{ .Values.node.logging.verbosity | quote }}
+{{- end -}}
