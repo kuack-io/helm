@@ -7,7 +7,7 @@ This Helm chart deploys the Kuack ecosystem, a Virtual Kubelet provider that ena
 Install the chart from the GitHub Container Registry:
 
 ```bash
-helm install kuack oci://ghcr.io/kuack-io/charts/kuack-node
+helm install kuack oci://ghcr.io/kuack-io/charts/kuack
 ```
 
 ## What is installed?
