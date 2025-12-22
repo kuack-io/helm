@@ -47,8 +47,6 @@ spec:
       - name: kuack-node
         image: {{ include "kuack-node.image" . | quote }}
         imagePullPolicy: {{ .Values.node.image.pullPolicy }}
-        command:
-          - /kuack-node
         ports:
         - name: http
           containerPort: {{ .Values.node.service.httpPort }}
