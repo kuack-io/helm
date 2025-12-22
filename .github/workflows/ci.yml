@@ -42,6 +42,7 @@ jobs:
   lint:
     name: Chart Lint
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -59,6 +60,7 @@ jobs:
   kubeconform:
     name: Kubeconform
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -81,6 +83,7 @@ jobs:
   checkov:
     name: Checkov
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' # only run on PRs
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -106,6 +109,7 @@ jobs:
   trivy:
     name: Trivy
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' # only run on PRs
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -119,4 +123,24 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
-          trivyignores: '.trivyignore.yaml'
+        env:
+          TRIVY_IGNOREFILE: .trivyignore.yaml
+
+  ci-passed:
+    name: CI Passed
+    runs-on: ubuntu-latest
+    if: always() && github.event_name == 'pull_request' # only run on PRs
+    needs: [pre-commit, lint, kubeconform, checkov, trivy]
+    steps:
+      - name: Check status of all required jobs
+        run: |
+          echo "Results: ${{ toJson(needs) }}"
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" || "${{ contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            echo "One or more jobs failed or were cancelled"
+            exit 1
+          fi
+          if [[ "${{ contains(needs.*.result, 'skipped') }}" == "true" ]]; then
+            echo "One or more jobs were skipped, but strictly required"
+            exit 1
+          fi
+          echo "All required checks passed"
