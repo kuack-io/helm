@@ -1,3 +1,9 @@
+## [1.0.9](https://github.com/kuack-io/helm/compare/v1.0.8...v1.0.9) (2025-12-23)
+
+### Bug Fixes
+
+* remove runclass ([4c71fe5](https://github.com/kuack-io/helm/commit/4c71fe5564dd087d2f22a7c02c1d88077c38a085))
+
 ## [1.0.8](https://github.com/kuack-io/helm/compare/v1.0.7...v1.0.8) (2025-12-22)
 
 ### Bug Fixes
