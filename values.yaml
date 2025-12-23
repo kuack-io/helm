@@ -146,18 +146,6 @@ node:
     # klog verbosity level (0-10)
     verbosity: 2
 
-  runtimeClass:
-    enabled: true
-    name: "kuack-edge"
-    handler: "virtual-kuack"
-    nodeSelector:
-      type: virtual-kubelet
-    tolerations:
-      - key: "virtual-kubelet.io/provider"
-        operator: "Equal"
-        value: "wasm"
-        effect: "NoSchedule"
-
   # Pod disruption budget
   podDisruptionBudget:
     enabled: false
