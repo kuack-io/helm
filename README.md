@@ -33,13 +33,13 @@ helm install kuack oci://ghcr.io/kuack-io/charts/kuack
 
 2. **Connect a Browser Agent**
 
-    Open <http://localhost:8080> in your browser. You should see the Kuack Agent interface waiting for tasks. Type in the address where the Node service can be reached (i.e. <ws://127.0.0.1:8081> for port-forwarding above).
+    Open <http://localhost:8080> in your browser. You should see the Kuack Agent interface waiting for tasks. Type in the address where the Node service can be reached (i.e. `ws://127.0.0.1:8081` for port-forwarding above).
 
 3. **Run an Example**
 
     To see Kuack in action, you can use the **[Kuack Checker](https://github.com/kuack-io/checker)**.
 
-    Create a pod that tolerates the virtual-kubelet taint and selects the wasm provider:
+    Create a pod that tolerates the kuack-node taint and selects the kuack provider:
 
     ```yaml
     apiVersion: v1
@@ -48,11 +48,11 @@ helm install kuack oci://ghcr.io/kuack-io/charts/kuack
       name: checker
     spec:
       nodeSelector:
-        type: virtual-kubelet
+        kuack.io/node-type: kuack-node
       tolerations:
-        - key: "virtual-kubelet.io/provider"
+        - key: "kuack.io/provider"
           operator: "Equal"
-          value: "wasm"
+          value: "kuack"
           effect: "NoSchedule"
       containers:
         - name: checker
