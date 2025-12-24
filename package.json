@@ -21,7 +21,8 @@
         {
           "releaseRules": [
             { "type": "build", "scope": "deps", "release": "patch" },
-            { "type": "build", "scope": "deps-dev", "release": "patch" }
+            { "type": "build", "scope": "deps-dev", "release": "patch" },
+            { "type": "bump", "release": "patch" }
           ]
         }
       ],
@@ -33,7 +34,8 @@
             "types": [
               { "type": "feat", "section": "Features" },
               { "type": "fix", "section": "Bug Fixes" },
-              { "type": "build", "section": "Dependencies", "hidden": false }
+              { "type": "build", "section": "Dependencies", "hidden": false },
+              { "type": "bump", "section": "Image Updates", "hidden": false }
             ]
           }
         }

@@ -10,6 +10,7 @@
 # It can be one of:
 #   - feat        for new features introduced (i.e. MINOR in SemVer standard)
 #   - fix         for bug-fixes (i.e. PATCH in SemVer standard)
+#   - bump        for image version updates (i.e. PATCH in SemVer standard)
 #   - build       for changes in build system or environment
 #   - ci          for configuring continuous integration systems
 #   - test        for adding new tests or correcting defective tests
