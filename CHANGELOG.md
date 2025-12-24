@@ -1,3 +1,9 @@
+## [1.0.10](https://github.com/kuack-io/helm/compare/v1.0.9...1.0.10) (2025-12-24)
+
+### Image Updates
+
+* update versions ([236b58b](https://github.com/kuack-io/helm/commit/236b58b818b4d150a2805f8d4e1cfa824b17d85b))
+
 ## [1.0.9](https://github.com/kuack-io/helm/compare/v1.0.8...v1.0.9) (2025-12-23)
 
 ### Bug Fixes
