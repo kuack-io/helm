@@ -4,6 +4,20 @@
 # Global image pull secrets (optional)
 imagePullSecrets: []
 
+# Authentication configuration
+auth:
+  # Token for agent authentication
+  # WARNING: Providing the token here as a string is not secure for production environments.
+  # It is recommended to use an existing secret (auth.token.existingSecret) instead.
+  token:
+    # The token value. If existingSecret is not set, a secret will be created with this value.
+    # Default is a well-known value for ease of use in development/demos.
+    value: "kuack-demo-token"
+    # Name of an existing secret containing the token.
+    # The secret must have a key named "token".
+    # If set, auth.token.value is ignored.
+    existingSecret: ""
+
 # Node component configuration
 node:
   enabled: true
@@ -12,7 +26,7 @@ node:
     repository: ghcr.io/kuack-io/node
     pullPolicy: Always
     # tag defaults to "latest" if not specified
-    tag: "1.1.0"
+    tag: "1.2.0"
     # Optional: Use image digest instead of tag for immutability
     # Format: sha256:abc123...
     digest: ""
@@ -44,10 +58,17 @@ node:
     # Disable the default taint on the node
     disableTaint: false
 
+  # Logging configuration
+  logging:
+    # klog verbosity level (0-5)
+    verbosity: 2
+
   # HTTP server configuration
   http:
-    # Listen address for HTTP server
-    listenAddr: ":8080"
+    # Port for the public server (Agent + Registry)
+    publicPort: 8080
+    # Port for the internal server (Logs + Health)
+    internalPort: 10250
 
   # ConfigMap configuration
   configMap:
@@ -141,11 +162,6 @@ node:
       #     - kuack-node.example.com
     # HTTP/HTTPS is fully supported by standard Kubernetes Ingress.
 
-  # Logging configuration
-  logging:
-    # klog verbosity level (0-10)
-    verbosity: 2
-
   # Pod disruption budget
   podDisruptionBudget:
     enabled: false
@@ -163,7 +179,7 @@ node:
   # Liveness and readiness probes
   probes:
     enabled: true
-    # Note: Probes use TCP socket checks on the kubelet port
+    # Note: Probes use HTTP checks on the health port
 
 # Agent component configuration
 agent:
@@ -173,7 +189,7 @@ agent:
     repository: ghcr.io/kuack-io/agent
     pullPolicy: Always
     # tag defaults to "latest" if not specified
-    tag: "1.2.0"
+    tag: "1.3.0"
     # Optional: Use image digest instead of tag for immutability
     # Format: sha256:abc123...
     digest: ""

@@ -55,14 +55,15 @@ spec:
           containerPort: {{ .Values.node.service.kubeletPort }}
           protocol: TCP
         env:
-        - name: POD_NAME
+        - name: POD_IP
           valueFrom:
             fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
+              fieldPath: status.podIP
+        - name: AGENT_TOKEN
           valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
+            secretKeyRef:
+              name: {{ if .Values.auth.token.existingSecret }}{{ .Values.auth.token.existingSecret }}{{ else }}{{ include "kuack.fullname" . }}-auth{{ end }}
+              key: token
         {{- if .Values.node.configMap.create }}
         envFrom:
         - configMapRef:
@@ -71,8 +72,10 @@ spec:
         # Environment variables when ConfigMap is not used
         - name: NODE_NAME
           value: {{ .Values.node.config.name | quote }}
-        - name: HTTP_LISTEN_ADDR
-          value: {{ .Values.node.http.listenAddr | quote }}
+        - name: PUBLIC_PORT
+          value: {{ .Values.node.http.publicPort | quote }}
+        - name: INTERNAL_PORT
+          value: {{ .Values.node.http.internalPort | quote }}
         - name: DISABLE_TAINT
           value: {{ .Values.node.config.disableTaint | quote }}
         {{- if .Values.node.kubeconfig.path }}
@@ -95,14 +98,16 @@ spec:
         # Note: Probes are disabled by default because the distroless image
         # doesn't include shell utilities. If you need probes, use a different base image.
         livenessProbe:
-          tcpSocket:
+          httpGet:
+            path: /healthz
             port: {{ .Values.node.service.kubeletPort }}
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
         readinessProbe:
-          tcpSocket:
+          httpGet:
+            path: /healthz
             port: {{ .Values.node.service.kubeletPort }}
           initialDelaySeconds: 10
           periodSeconds: 5

@@ -22,11 +22,13 @@ helm install kuack oci://ghcr.io/kuack-io/charts/kuack
     You need to expose both the Node and Agent services to your local machine.
 
     Forward the Node service (API):
+
     ```bash
     kubectl port-forward service/kuack-node 8081:8080
     ```
 
     Forward the Agent service (UI):
+
     ```bash
     kubectl port-forward service/kuack-agent 8080:8080
     ```
@@ -57,9 +59,14 @@ helm install kuack oci://ghcr.io/kuack-io/charts/kuack
       containers:
         - name: checker
           image: ghcr.io/kuack-io/checker:latest
+          env:
+            - name: TARGET_URL
+              value: "https://kuack.io"
     ```
 
     Once deployed, the pod will be scheduled to your browser agent, and Pod will be successfully completed. You can check Console in your browser tab or check the Pod status and logs via `kubectl`.
+
+    **Note:** Log streaming (`kubectl logs`) will not work in K3s clusters because its implementation for kubelet connectivity (using a custom remotedialer tunnel) is non-standard. Support for K3s will be added in later releases. For now, please use Minikube, Kind, EKS, GKE, or other non-Rancher clusters.
 
 ## Configuration
 
