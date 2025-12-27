@@ -1,3 +1,9 @@
+## [1.0.11](https://github.com/kuack-io/helm/compare/1.0.10...1.0.11) (2025-12-27)
+
+### Bug Fixes
+
+* updates for rbac ([b1e88ab](https://github.com/kuack-io/helm/commit/b1e88abd5028c3715bd841fae85dc871495037fe))
+
 ## [1.0.10](https://github.com/kuack-io/helm/compare/v1.0.9...1.0.10) (2025-12-24)
 
 ### Image Updates
