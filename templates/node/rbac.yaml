@@ -18,7 +18,6 @@ rules:
       - create
       - update
       - patch
-      - delete
   # Nodes/status: Virtual Kubelet needs to update node status
   - apiGroups:
       - ""
@@ -40,7 +39,6 @@ rules:
       - create
       - update
       - patch
-      - delete
   # Pods/status: Virtual Kubelet needs to update pod status
   - apiGroups:
       - ""
@@ -85,6 +83,43 @@ rules:
       - get
       - list
       - watch
+  # CertificateSigningRequests: For requesting kubelet serving certificates
+  - apiGroups:
+      - certificates.k8s.io
+    resources:
+      - certificatesigningrequests
+    verbs:
+      - create
+      - get
+      - list
+      - watch
+      - delete
+  # CertificateSigningRequests/approval: For auto-approving certificates
+  - apiGroups:
+      - certificates.k8s.io
+    resources:
+      - certificatesigningrequests/approval
+    verbs:
+      - update
+  # Signers: For kubelet-serving signer
+  - apiGroups:
+      - certificates.k8s.io
+    resources:
+      - signers
+    resourceNames:
+      - kubernetes.io/kubelet-serving
+    verbs:
+      - approve
+  # Leases: For node leases (heartbeat)
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - create
+      - update
+      - patch
   {{- with .Values.node.rbac.extraRules }}
   {{- toYaml . | nindent 2 }}
   {{- end }}

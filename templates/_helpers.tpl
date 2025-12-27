@@ -171,7 +171,8 @@ Used for checksum calculation in deployment.
 */}}
 {{- define "kuack-node.configMapData" -}}
 NODE_NAME: {{ .Values.node.config.name | quote }}
-HTTP_LISTEN_ADDR: {{ .Values.node.http.listenAddr | quote }}
+PUBLIC_PORT: {{ .Values.node.http.publicPort | quote }}
+INTERNAL_PORT: {{ .Values.node.http.internalPort | quote }}
 DISABLE_TAINT: {{ .Values.node.config.disableTaint | quote }}
 {{- if .Values.node.kubeconfig.path }}
 KUBECONFIG: {{ .Values.node.kubeconfig.path | quote }}
