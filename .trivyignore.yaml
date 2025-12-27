@@ -26,3 +26,7 @@ misconfigurations:
       - "templates/agent/deployment.yaml"
   # ghcr.io is the trusted registry for this project.
   - id: AVD-KSV-0125
+  # INTERNAL_PORT and PUBLIC_PORT are non-sensitive port numbers, not secrets.
+  - id: AVD-KSV-01010
+    paths:
+      - "templates/node/configmap.yaml"
