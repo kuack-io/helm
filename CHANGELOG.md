@@ -1,3 +1,9 @@
+## [1.0.14](https://github.com/kuack-io/helm/compare/1.0.13...1.0.14) (2025-12-28)
+
+### Bug Fixes
+
+* change default probe schema since certificates are implemented ([2310f59](https://github.com/kuack-io/helm/commit/2310f59c1be48b5a2419a0245bc77cb556c787d3))
+
 ## [1.0.13](https://github.com/kuack-io/helm/compare/1.0.12...1.0.13) (2025-12-28)
 
 ### Bug Fixes
