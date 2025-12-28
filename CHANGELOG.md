@@ -1,3 +1,9 @@
+## [1.0.13](https://github.com/kuack-io/helm/compare/1.0.12...1.0.13) (2025-12-28)
+
+### Bug Fixes
+
+* add missed secret values ([63b1bd4](https://github.com/kuack-io/helm/commit/63b1bd470fe1a793a561c1845aaadc6deeece618))
+
 ## [1.0.12](https://github.com/kuack-io/helm/compare/1.0.11...1.0.12) (2025-12-27)
 
 ### Bug Fixes
