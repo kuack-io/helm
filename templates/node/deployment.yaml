@@ -96,12 +96,12 @@ spec:
         securityContext:
           {{- toYaml .Values.node.pod.containerSecurityContext | nindent 10 }}
         {{- if .Values.node.probes.enabled }}
-        # Note: Probes are disabled by default because the distroless image
-        # doesn't include shell utilities. If you need probes, use a different base image.
+        {{- $probeScheme := default "HTTPS" .Values.node.probes.scheme }}
         livenessProbe:
           httpGet:
             path: /healthz
             port: {{ .Values.node.service.kubeletPort }}
+            scheme: {{ $probeScheme }}
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -110,6 +110,7 @@ spec:
           httpGet:
             path: /healthz
             port: {{ .Values.node.service.kubeletPort }}
+            scheme: {{ $probeScheme }}
           initialDelaySeconds: 10
           periodSeconds: 5
           timeoutSeconds: 3

@@ -179,7 +179,8 @@ node:
   # Liveness and readiness probes
   probes:
     enabled: true
-    # Note: Probes use HTTP checks on the health port
+    # Scheme used by health probes against the kubelet endpoint
+    scheme: HTTPS
 
 # Agent component configuration
 agent:
