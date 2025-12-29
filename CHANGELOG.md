@@ -1,3 +1,9 @@
+## [1.0.16](https://github.com/kuack-io/helm/compare/1.0.15...1.0.16) (2025-12-29)
+
+### Image Updates
+
+* node ([72c6968](https://github.com/kuack-io/helm/commit/72c6968a82371105364e6b24590746e11fc3b059))
+
 ## [1.0.15](https://github.com/kuack-io/helm/compare/1.0.14...1.0.15) (2025-12-29)
 
 ### Image Updates
