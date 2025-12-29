@@ -26,7 +26,7 @@ node:
     repository: ghcr.io/kuack-io/node
     pullPolicy: Always
     # tag defaults to "latest" if not specified
-    tag: "1.2.0"
+    tag: "1.2.3"
     # Optional: Use image digest instead of tag for immutability
     # Format: sha256:abc123...
     digest: ""
