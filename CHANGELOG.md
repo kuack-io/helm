@@ -1,3 +1,9 @@
+## [1.0.17](https://github.com/kuack-io/helm/compare/1.0.16...1.0.17) (2025-12-29)
+
+### Image Updates
+
+* agent ([936dc04](https://github.com/kuack-io/helm/commit/936dc04873cea5bab6fe47190458d03a75d3d0ff))
+
 ## [1.0.16](https://github.com/kuack-io/helm/compare/1.0.15...1.0.16) (2025-12-29)
 
 ### Image Updates

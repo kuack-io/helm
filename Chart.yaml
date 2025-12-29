@@ -2,7 +2,7 @@ apiVersion: v2
 name: kuack
 description: A Helm chart for Kuack - Virtual Kubelet provider for WASM workloads that enables scheduling Kubernetes pods to browser-based agents.
 type: application
-version: 1.0.16
+version: 1.0.17
 keywords:
   - wasm
   - kubernetes
