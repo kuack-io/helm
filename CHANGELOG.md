@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/kuack-io/helm/compare/1.0.17...1.1.0) (2025-12-31)
+
+### Features
+
+* add globals ([4245d3b](https://github.com/kuack-io/helm/commit/4245d3b6ddfa5e8311b2b2f25158eddde89e3d5d))
+
 ## [1.0.17](https://github.com/kuack-io/helm/compare/1.0.16...1.0.17) (2025-12-29)
 
 ### Image Updates
