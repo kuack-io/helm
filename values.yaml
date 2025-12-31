@@ -1,8 +1,22 @@
 # Default values for kuack
 # This is a YAML-formatted file.
 
-# Global image pull secrets (optional)
-imagePullSecrets: []
+# Global settings
+global:
+  # Custom labels to apply to all resources
+  # These labels are added to all Kubernetes objects created by this chart.
+  # Useful for identifying resources in multi-tenant environments or for testing.
+  # Example:
+  #   labels:
+  #     environment: production
+  #     team: platform
+  labels: {}
+
+  # Image pull secrets applied to all components
+  # Example:
+  #   imagePullSecrets:
+  #     - name: my-registry-secret
+  imagePullSecrets: []
 
 # Authentication configuration
 auth:
