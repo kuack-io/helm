@@ -72,7 +72,7 @@ spec:
         {{- else }}
         # Environment variables when ConfigMap is not used
         - name: NODE_NAME
-          value: {{ .Values.node.config.name | quote }}
+          value: {{ include "kuack-node.nodeName" . | quote }}
         - name: PUBLIC_PORT
           value: {{ .Values.node.http.publicPort | quote }}
         - name: INTERNAL_PORT

@@ -169,11 +169,24 @@ Properly handles registry:port/repository:tag format
 {{- end -}}
 
 {{/*
+Node name for registration in Kubernetes.
+Uses fullnameOverride if set, otherwise falls back to node.config.name.
+This ensures each Helm release registers as a unique Kubernetes node.
+*/}}
+{{- define "kuack-node.nodeName" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- .Values.node.config.name }}
+{{- end }}
+{{- end }}
+
+{{/*
 ConfigMap data content for node component.
 Used for checksum calculation in deployment.
 */}}
 {{- define "kuack-node.configMapData" -}}
-NODE_NAME: {{ .Values.node.config.name | quote }}
+NODE_NAME: {{ include "kuack-node.nodeName" . | quote }}
 PUBLIC_PORT: {{ .Values.node.http.publicPort | quote }}
 INTERNAL_PORT: {{ .Values.node.http.internalPort | quote }}
 DISABLE_TAINT: {{ .Values.node.config.disableTaint | quote }}
