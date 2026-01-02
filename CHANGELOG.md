@@ -1,3 +1,14 @@
+## [1.1.1](https://github.com/kuack-io/helm/compare/1.1.0...1.1.1) (2026-01-02)
+
+### Bug Fixes
+
+* rbac rights to de-register the node ([e75ecb5](https://github.com/kuack-io/helm/commit/e75ecb511a5e27afb2ada878d89cc53e1cbc5573))
+* respect name override for node name ([1f88026](https://github.com/kuack-io/helm/commit/1f880263077c975ae24a1559078b79216359249f))
+
+### Image Updates
+
+* node and agent ([f5dde00](https://github.com/kuack-io/helm/commit/f5dde0028b823e8c740fb47e992b5daead259b71))
+
 ## [1.1.0](https://github.com/kuack-io/helm/compare/1.0.17...1.1.0) (2025-12-31)
 
 ### Features
