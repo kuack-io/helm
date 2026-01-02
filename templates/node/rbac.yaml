@@ -20,6 +20,7 @@ rules:
       - create
       - update
       - patch
+      - delete
   # Nodes/status: Virtual Kubelet needs to update node status
   - apiGroups:
       - ""
