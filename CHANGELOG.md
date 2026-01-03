@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/kuack-io/helm/compare/1.1.1...1.2.0) (2026-01-03)
+
+### Features
+
+* pass node name to support multiple nodes ([a932fdc](https://github.com/kuack-io/helm/commit/a932fdc0cf3c9aca014d7e1777a1e69c26d92752))
+
 ## [1.1.1](https://github.com/kuack-io/helm/compare/1.1.0...1.1.1) (2026-01-02)
 
 ### Bug Fixes
