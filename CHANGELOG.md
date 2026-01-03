@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/kuack-io/helm/compare/1.3.0...1.3.1) (2026-01-03)
+
+### Bug Fixes
+
+* cleanup job needs ServiceAccount token ([5477a27](https://github.com/kuack-io/helm/commit/5477a27c4f6c9718fe9698ecfead8a3284c85d31))
+
 ## [1.3.0](https://github.com/kuack-io/helm/compare/1.2.0...1.3.0) (2026-01-03)
 
 ### Features
