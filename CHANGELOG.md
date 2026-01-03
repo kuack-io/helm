@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/kuack-io/helm/compare/1.2.0...1.3.0) (2026-01-03)
+
+### Features
+
+* uninstall cleanup ([a89ebc9](https://github.com/kuack-io/helm/commit/a89ebc9a80966697a51230b7786ca6cace3ed2c0))
+
 ## [1.2.0](https://github.com/kuack-io/helm/compare/1.1.1...1.2.0) (2026-01-03)
 
 ### Features
