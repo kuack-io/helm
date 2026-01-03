@@ -71,3 +71,8 @@ helm install kuack oci://ghcr.io/kuack-io/charts/kuack --wait
 ## Configuration
 
 See [values.yaml](values.yaml) for all options.
+
+### Uninstall cleanup
+
+By default, the chart enables a small `pre-delete` hook job that deletes the Kuack virtual `Node` object during `helm uninstall`.
+This avoids a race where Helm can remove RBAC/service accounts while the node Pod is terminating, preventing the Pod from deleting its own `Node`.

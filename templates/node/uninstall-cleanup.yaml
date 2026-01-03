@@ -1,0 +1,114 @@
+{{- if and .Values.node.enabled .Values.node.cleanupOnUninstall.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+rules:
+  # Stop the node deployment and wait for pods to exit
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  # Delete the virtual node object (cluster-scoped)
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "delete"]
+  # Best-effort lease cleanup (namespaced in kube-node-lease)
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+    app.kubernetes.io/component: node-uninstall-cleanup
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        {{- include "kuack-node.labels" . | nindent 8 }}
+        app.kubernetes.io/component: node-uninstall-cleanup
+    spec:
+      serviceAccountName: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+      restartPolicy: Never
+      containers:
+        - name: cleanup
+          image: "{{ .Values.node.cleanupOnUninstall.image.repository }}:{{ .Values.node.cleanupOnUninstall.image.tag }}"
+          imagePullPolicy: {{ .Values.node.cleanupOnUninstall.image.pullPolicy }}
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: DEPLOYMENT_NAME
+              value: {{ include "kuack-node.fullname" . | quote }}
+            - name: NODE_NAME
+              value: {{ include "kuack-node.nodeName" . | quote }}
+            - name: POD_SELECTOR
+              value: {{ printf "app.kubernetes.io/name=%s,app.kubernetes.io/instance=%s,app.kubernetes.io/component=node" (include "kuack-node.name" .) .Release.Name | quote }}
+            - name: TIMEOUT_SECONDS
+              value: {{ .Values.node.cleanupOnUninstall.timeoutSeconds | quote }}
+          command:
+            - /bin/sh
+            - -ceu
+            - |
+              echo "Stopping kuack node deployment: ${DEPLOYMENT_NAME} (ns=${POD_NAMESPACE})"
+              kubectl -n "${POD_NAMESPACE}" delete deployment "${DEPLOYMENT_NAME}" --ignore-not-found=true
+
+              echo "Waiting for kuack node pods to terminate (selector=${POD_SELECTOR})..."
+              kubectl -n "${POD_NAMESPACE}" wait --for=delete pod -l "${POD_SELECTOR}" --timeout="${TIMEOUT_SECONDS}s" || true
+
+              echo "Deleting virtual Kubernetes Node: ${NODE_NAME}"
+              kubectl delete node "${NODE_NAME}" --ignore-not-found=true
+
+              echo "Deleting node lease (best-effort): ${NODE_NAME}"
+              kubectl -n kube-node-lease delete lease "${NODE_NAME}" --ignore-not-found=true || true
+{{- end }}

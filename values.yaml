@@ -40,7 +40,7 @@ node:
     repository: ghcr.io/kuack-io/node
     pullPolicy: Always
     # tag defaults to "latest" if not specified
-    tag: "1.2.6"
+    tag: "1.2.8"
     # Optional: Use image digest instead of tag for immutability
     # Format: sha256:abc123...
     digest: ""
@@ -64,6 +64,20 @@ node:
     create: true
     # Additional ClusterRole rules
     extraRules: []
+
+  # Cleanup behavior on `helm uninstall`
+  # Helm uninstall deletes RBAC/ServiceAccount asynchronously while Pods are terminating,
+  # which can prevent the node Pod from deleting its own Kubernetes Node object.
+  # This optional hook job avoids that race by stopping the Deployment and deleting the Node.
+  cleanupOnUninstall:
+    enabled: true
+    # kubectl image to run cleanup commands
+    image:
+      repository: public.ecr.aws/bitnami/kubectl
+      tag: "1.34.0"
+      pullPolicy: IfNotPresent
+    # Maximum time to wait for node pods to terminate before deleting the Node anyway
+    timeoutSeconds: 60
 
   # Node configuration
   config:
