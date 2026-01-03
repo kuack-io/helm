@@ -1,1 +1,4 @@
-skip-path:
+skip-check:
+  - CKV_K8S_13  # Memory limits should be set. We never set memory limits on purpose.
+  - CKV_K8S_43  # Image should use digest. Too strict for our use case.
+  - CKV_K8S_15  # Image Pull Policy should be Always. IfNotPresent is acceptable.

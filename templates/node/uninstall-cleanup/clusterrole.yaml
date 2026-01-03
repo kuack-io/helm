@@ -1,0 +1,28 @@
+{{- if and .Values.node.enabled .Values.node.cleanupOnUninstall.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+rules:
+  # Stop the node deployment and wait for pods to exit
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  # Delete the virtual node object (cluster-scoped)
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "delete"]
+  # Best-effort lease cleanup (namespaced in kube-node-lease)
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "delete"]
+{{- end }}

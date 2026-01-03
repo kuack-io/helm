@@ -1,62 +1,4 @@
 {{- if and .Values.node.enabled .Values.node.cleanupOnUninstall.enabled }}
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "kuack-node.labels" . | nindent 4 }}
-  annotations:
-    "helm.sh/hook": pre-delete
-    "helm.sh/hook-weight": "-10"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
-  labels:
-    {{- include "kuack-node.labels" . | nindent 4 }}
-  annotations:
-    "helm.sh/hook": pre-delete
-    "helm.sh/hook-weight": "-10"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-rules:
-  # Stop the node deployment and wait for pods to exit
-  - apiGroups: ["apps"]
-    resources: ["deployments"]
-    verbs: ["get", "list", "watch", "delete"]
-  - apiGroups: [""]
-    resources: ["pods"]
-    verbs: ["get", "list", "watch"]
-  # Delete the virtual node object (cluster-scoped)
-  - apiGroups: [""]
-    resources: ["nodes"]
-    verbs: ["get", "delete"]
-  # Best-effort lease cleanup (namespaced in kube-node-lease)
-  - apiGroups: ["coordination.k8s.io"]
-    resources: ["leases"]
-    verbs: ["get", "list", "watch", "delete"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
-  labels:
-    {{- include "kuack-node.labels" . | nindent 4 }}
-  annotations:
-    "helm.sh/hook": pre-delete
-    "helm.sh/hook-weight": "-10"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
-subjects:
-  - kind: ServiceAccount
-    name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
-    namespace: {{ .Release.Namespace }}
----
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -69,6 +11,7 @@ metadata:
     "helm.sh/hook": pre-delete
     "helm.sh/hook-weight": "0"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    checkov.io/skip1: CKV_K8S_38=Service account token required for kubectl commands
 spec:
   backoffLimit: 0
   template:
@@ -78,11 +21,33 @@ spec:
         app.kubernetes.io/component: node-uninstall-cleanup
     spec:
       serviceAccountName: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+      automountServiceAccountToken: true  # Required for kubectl commands
       restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: cleanup
           image: "{{ .Values.node.cleanupOnUninstall.image.repository }}:{{ .Values.node.cleanupOnUninstall.image.tag }}"
           imagePullPolicy: {{ .Values.node.cleanupOnUninstall.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
           env:
             - name: POD_NAMESPACE
               valueFrom:

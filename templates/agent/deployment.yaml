@@ -7,9 +7,8 @@ metadata:
   labels:
     {{- include "kuack-agent.labels" . | nindent 4 }}
   annotations:
-    checkov.io/skip1: CKV_K8S_43=Image digests are optional in Helm charts for flexibility. Users can provide image.digest in values.yaml if they require immutability.
-    checkov.io/skip2: CKV_K8S_40=Agent runs as nginx user (UID 101) which is standard for nginx-unprivileged image. This cannot be changed without rebuilding the image.
-    checkov.io/skip3: CKV_K8S_22=nginx requires write access to filesystem for logs and cache directories. The nginx-unprivileged image needs write access to /var/cache/nginx and /var/run.
+    checkov.io/skip1: CKV_K8S_40=Agent runs as nginx user (UID 101) which is standard for nginx-unprivileged image. This cannot be changed without rebuilding the image.
+    checkov.io/skip2: CKV_K8S_22=nginx requires write access to filesystem for logs and cache directories. The nginx-unprivileged image needs write access to /var/cache/nginx and /var/run.
 spec:
   replicas: {{ .Values.agent.replicas }}
   selector:
@@ -32,9 +31,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "kuack-agent.serviceAccountName" . }}
-      {{- if eq .Values.agent.serviceAccount.automountServiceAccountToken false }}
-      automountServiceAccountToken: false
-      {{- end }}
+      automountServiceAccountToken: false  # Not needed for agent
       securityContext:
         {{- toYaml .Values.agent.pod.securityContext | nindent 8 }}
       containers:
