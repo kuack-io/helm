@@ -1,0 +1,20 @@
+{{- if and .Values.node.enabled .Values.node.cleanupOnUninstall.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+    namespace: {{ .Release.Namespace }}
+{{- end }}

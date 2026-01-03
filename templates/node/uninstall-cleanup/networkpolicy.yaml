@@ -1,0 +1,28 @@
+{{- if and .Values.node.enabled .Values.node.cleanupOnUninstall.enabled .Values.node.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "kuack-node.fullname" . }}-uninstall-cleanup
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
+    app.kubernetes.io/component: node-uninstall-cleanup
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "kuack-node.labels" . | nindent 6 }}
+      app.kubernetes.io/component: node-uninstall-cleanup
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    # Allow egress to Kubernetes API server for kubectl commands.
+    # Different implementations may require different egress rules.
+    # Since we use kubectl image, let's keep it simple for now.
+    - {}
+{{- end }}

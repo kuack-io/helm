@@ -54,9 +54,6 @@ node:
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
-    # Automount service account token
-    # Set to false if the pod doesn't need to access the Kubernetes API
-    automountServiceAccountToken: true
 
   # RBAC configuration
   rbac:
@@ -232,9 +229,6 @@ agent:
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
-    # Automount service account token
-    # Set to false if the pod doesn't need to access the Kubernetes API
-    automountServiceAccountToken: false
 
   # Pod configuration
   pod:

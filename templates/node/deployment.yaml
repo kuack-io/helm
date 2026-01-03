@@ -7,9 +7,8 @@ metadata:
   labels:
     {{- include "kuack-node.labels" . | nindent 4 }}
   annotations:
-    checkov.io/skip1: CKV_K8S_43=Image digests are optional in Helm charts for flexibility. Users can provide image.digest in values.yaml if they require immutability.
-    checkov.io/skip2: CKV_K8S_38=This virtual kubelet requires the service account token to interact with the Kubernetes API for node registration, pod scheduling, and resource management. The token is necessary for the application to function.
-    checkov.io/skip3: CKV_K8S_35=The AGENT_TOKEN secret is used as an environment variable for compatibility with the application's configuration. The token is non-sensitive configuration data, not a high-value secret.
+    checkov.io/skip1: CKV_K8S_38=This virtual kubelet requires the service account token to interact with the Kubernetes API for node registration, pod scheduling, and resource management. The token is necessary for the application to function.
+    checkov.io/skip2: CKV_K8S_35=The AGENT_TOKEN secret is used as an environment variable for compatibility with the application's configuration. The token is non-sensitive configuration data, not a high-value secret.
 spec:
   {{- if not .Values.node.podDisruptionBudget.enabled }}
   replicas: 1
@@ -37,11 +36,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "kuack-node.serviceAccountName" . }}
-      {{- if eq .Values.node.serviceAccount.automountServiceAccountToken false }}
-      automountServiceAccountToken: false
-      {{- else }}
-      automountServiceAccountToken: true
-      {{- end }}
+      automountServiceAccountToken: true  # Required for Kubernetes API access
       securityContext:
         {{- toYaml .Values.node.pod.securityContext | nindent 8 }}
       containers:
