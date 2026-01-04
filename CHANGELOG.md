@@ -1,3 +1,9 @@
+## [1.3.2](https://github.com/kuack-io/helm/compare/1.3.1...1.3.2) (2026-01-04)
+
+### Image Updates
+
+* agent (trailing slash in UI fix) ([9d590bc](https://github.com/kuack-io/helm/commit/9d590bc0255085ca8b8a4fe83f5b7351499005d3))
+
 ## [1.3.1](https://github.com/kuack-io/helm/compare/1.3.0...1.3.1) (2026-01-03)
 
 ### Bug Fixes
