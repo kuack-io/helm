@@ -1,3 +1,9 @@
+## [1.3.3](https://github.com/kuack-io/helm/compare/1.3.2...1.3.3) (2026-01-08)
+
+### Image Updates
+
+* new versions (wasi c2w support) ([a7f1c37](https://github.com/kuack-io/helm/commit/a7f1c37a6c7e4e76efd9b9ee67859acdf46c9634))
+
 ## [1.3.2](https://github.com/kuack-io/helm/compare/1.3.1...1.3.2) (2026-01-04)
 
 ### Image Updates
