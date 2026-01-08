@@ -40,7 +40,7 @@ node:
     repository: ghcr.io/kuack-io/node
     pullPolicy: Always
     # tag defaults to "latest" if not specified
-    tag: "1.2.8"
+    tag: "1.3.0"
     # Optional: Use image digest instead of tag for immutability
     # Format: sha256:abc123...
     digest: ""
@@ -215,7 +215,7 @@ agent:
     repository: ghcr.io/kuack-io/agent
     pullPolicy: Always
     # tag defaults to "latest" if not specified
-    tag: "1.3.6"
+    tag: "1.4.0"
     # Optional: Use image digest instead of tag for immutability
     # Format: sha256:abc123...
     digest: ""
