@@ -1,3 +1,9 @@
+## [1.3.4](https://github.com/kuack-io/helm/compare/1.3.3...1.3.4) (2026-01-15)
+
+### Image Updates
+
+* node and resources ([db58968](https://github.com/kuack-io/helm/commit/db58968297359ae82af6f7d4e81f0fcfcbdabad0))
+
 ## [1.3.3](https://github.com/kuack-io/helm/compare/1.3.2...1.3.3) (2026-01-08)
 
 ### Image Updates
