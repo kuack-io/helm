@@ -42,7 +42,33 @@ spec:
     {{- if .Values.node.networkPolicy.egress }}
     {{- toYaml .Values.node.networkPolicy.egress | nindent 4 }}
     {{- else }}
-    # Allow all egress (required for kubelet API calls and HTTP connections)
-    - {}
+    # Allow egress to kube-apiserver (for kubelet API)
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: default
+      ports:
+      - protocol: TCP
+        port: 443
+      - protocol: TCP
+        port: 6443
+    # Allow egress to registry (for /resolve endpoint)
+    - to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: kuack-registry
+      ports:
+      - protocol: TCP
+        port: 8080
+    # Allow DNS resolution
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+      ports:
+      - protocol: UDP
+        port: 53
+      - protocol: TCP
+        port: 53
     {{- end }}
 {{- end }}

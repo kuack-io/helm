@@ -1,0 +1,68 @@
+{{- if .Values.registry.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kuack-registry.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-registry.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.registry.replicas }}
+  selector:
+    matchLabels:
+      {{- include "kuack-registry.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.registry.pod.annotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "kuack-registry.selectorLabels" . | nindent 8 }}
+        {{- with .Values.registry.pod.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kuack-registry.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      securityContext:
+        {{- toYaml .Values.registry.pod.securityContext | nindent 8 }}
+      containers:
+      - name: kuack-registry
+        image: {{ include "kuack-registry.image" . | quote }}
+        imagePullPolicy: {{ .Values.registry.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.registry.service.port }}
+          protocol: TCP
+        env:
+        - name: REDIS_ADDR
+          value: {{ .Values.registry.redis.addr | quote }}
+        - name: REDIS_PASSWORD
+          {{- if and .Values.valkey.enabled .Values.valkey.auth.enabled }}
+          valueFrom:
+            secretKeyRef:
+              name: kuack-valkey-auth
+              key: password
+          {{- else }}
+          value: {{ .Values.registry.redis.password | quote }}
+          {{- end }}
+        - name: REDIS_DB
+          value: {{ .Values.registry.redis.db | quote }}
+        - name: PORT
+          value: {{ .Values.registry.service.port | quote }}
+        resources:
+          {{- toYaml .Values.registry.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.registry.pod.containerSecurityContext | nindent 10 }}
+        {{- if .Values.registry.probes.enabled }}
+        livenessProbe:
+          {{- toYaml .Values.registry.probes.livenessProbe | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.registry.probes.readinessProbe | nindent 10 }}
+        {{- end }}
+{{- end }}

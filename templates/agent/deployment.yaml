@@ -6,9 +6,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "kuack-agent.labels" . | nindent 4 }}
-  annotations:
-    checkov.io/skip1: CKV_K8S_40=Agent runs as nginx user (UID 101) which is standard for nginx-unprivileged image. This cannot be changed without rebuilding the image.
-    checkov.io/skip2: CKV_K8S_22=nginx requires write access to filesystem for logs and cache directories. The nginx-unprivileged image needs write access to /var/cache/nginx and /var/run.
+  annotations: {} # Cleaned up checkov skips
 spec:
   replicas: {{ .Values.agent.replicas }}
   selector:
