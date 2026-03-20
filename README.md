@@ -72,6 +72,58 @@ helm install kuack oci://ghcr.io/kuack-io/charts/kuack --wait
 
 See [values.yaml](values.yaml) for all options.
 
+## Valkey (Cache Layer)
+
+This chart uses [Valkey](https://valkey.io/) as the caching layer for the registry service.
+
+### Why Valkey instead of Redis?
+
+- **Open Source**: Valkey is a truly open-source fork of Redis, maintained by the Linux Foundation. After Redis changed to a restrictive license (RSALv2/SSPLv1) in March 2024, the community created Valkey to continue open development.
+- **Protocol Compatible**: Valkey is 100% wire-compatible with Redis. The registry uses the standard [go-redis](https://github.com/redis/go-redis) client, which works with both Redis and Valkey without any code changes.
+- **AWS ECR Images**: The chart uses `public.ecr.aws/valkey/valkey` images to avoid Docker Hub rate limiting.
+
+### Default Setup
+
+By default, Valkey runs in **standalone mode** (single pod):
+- No persistence (it's a cache - data can be re-fetched from OCI registries)
+- LRU eviction enabled (`maxmemory 2gb`, `allkeys-lru` policy)
+- ~2.5GB memory limit (~20% headroom above maxmemory)
+
+This is sufficient for most use cases since cached WASM artifacts can always be re-downloaded if the cache is lost.
+
+### High Availability (Optional)
+
+For HA, enable replication in `values.yaml`:
+
+```yaml
+valkey:
+  replica:
+    enabled: true
+    replicas: 2
+    persistence:
+      size: "5Gi"  # Required for replica sync
+```
+
+This creates 1 master + 2 replicas (3 pods total). Note that **replicas require persistent storage** for data synchronization.
+
+### Using External Redis/Valkey
+
+To use an external Redis or Valkey instance, disable the subchart and configure the registry:
+
+```yaml
+valkey:
+  enabled: false
+
+registry:
+  redis:
+    addr: "your-redis.example.com:6379"
+    password: "your-password"
+```
+
+### Future Plans
+
+Native support for managed Redis/Valkey services (e.g., AWS ElastiCache with IAM authentication, Azure Cache for Redis with Entra ID) is not yet implemented but may be added in future releases.
+
 ### Uninstall cleanup
 
 By default, the chart enables a small `pre-delete` hook job that deletes the Kuack virtual `Node` object during `helm uninstall`.

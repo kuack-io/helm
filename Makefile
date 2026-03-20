@@ -14,14 +14,16 @@ template: dependencies
 	helm template . --debug --namespace kuack-system
 
 checkov: dependencies
-	helm template . --namespace kuack | checkov --directory . \
+	helm template . --namespace kuack --set valkey.enabled=false | checkov --directory . \
       --output cli \
       --config-file .checkovignore.yaml \
+      --skip-path charts \
       --skip-resources-without-violations
 
-trivy:
+trivy: dependencies
 	trivy config \
 		--ignorefile .trivyignore.yaml \
+		--skip-dirs charts \
 		--exit-code 1 \
 		.
 

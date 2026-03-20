@@ -17,11 +17,11 @@ spec:
     {{- if .Values.agent.networkPolicy.ingress }}
     {{- toYaml .Values.agent.networkPolicy.ingress | nindent 4 }}
     {{- else }}
-    # Allow ingress from same namespace
+    # Allow ingress from ingress-nginx (external browser access to static demo UI)
     - from:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: {{ .Release.Namespace }}
+            app.kubernetes.io/name: ingress-nginx
       ports:
       - protocol: TCP
         port: {{ .Values.agent.service.port }}
@@ -30,7 +30,16 @@ spec:
     {{- if .Values.agent.networkPolicy.egress }}
     {{- toYaml .Values.agent.networkPolicy.egress | nindent 4 }}
     {{- else }}
-    # Allow all egress (required for DNS and external connections)
-    - {}
+    # Agent only serves static files, minimal egress needed
+    # Allow DNS resolution only
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+      ports:
+      - protocol: UDP
+        port: 53
+      - protocol: TCP
+        port: 53
     {{- end }}
 {{- end }}

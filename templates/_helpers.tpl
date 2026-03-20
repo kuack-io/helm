@@ -113,6 +113,66 @@ app.kubernetes.io/component: agent
 {{- end }}
 
 {{/*
+Registry component helpers
+*/}}
+{{- define "kuack-registry.name" -}}
+{{- "kuack-registry" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{- define "kuack-registry.fullname" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- "kuack-registry" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+
+{{- define "kuack-registry.labels" -}}
+{{ include "kuack.labels" . }}
+{{ include "kuack-registry.selectorLabels" . }}
+{{- end }}
+
+{{- define "kuack-registry.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "kuack-registry.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: registry
+{{- end }}
+
+{{- define "kuack-registry.serviceAccountName" -}}
+{{- if .Values.registry.serviceAccount.create }}
+{{- default (include "kuack-registry.fullname" .) .Values.registry.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.registry.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Construct the image reference for registry component.
+*/}}
+{{- define "kuack-registry.image" -}}
+{{- if .Values.registry.image.digest -}}
+  {{- $repo := .Values.registry.image.repository -}}
+  {{- if regexMatch ".*/.+:.+$" $repo -}}
+    {{- $repo = regexReplaceAll "(.*/.+):.+$" $repo "$1" -}}
+  {{- end -}}
+  {{- printf "%s@%s" $repo .Values.registry.image.digest -}}
+{{- else -}}
+  {{- $explicitTag := .Values.registry.image.tag | default "" -}}
+  {{- $repo := .Values.registry.image.repository -}}
+  {{- if ne $explicitTag "" -}}
+    {{- if regexMatch ".*/.+:.+$" $repo -}}
+      {{- $repo = regexReplaceAll "(.*/.+):.+$" $repo "$1" -}}
+    {{- end -}}
+    {{- printf "%s:%s" $repo $explicitTag -}}
+  {{- else if regexMatch ".*/.+:.+$" $repo -}}
+    {{- $repo -}}
+  {{- else -}}
+    {{- printf "%s:%s" $repo "latest" -}}
+  {{- end -}}
+{{- end -}}
+{{- end }}
+
+{{/*
 Construct the image reference for node component.
 Handles: repository, repository:tag, digest override
 Properly handles registry:port/repository:tag format

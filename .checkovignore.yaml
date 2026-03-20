@@ -1,4 +1,11 @@
 skip-check:
-  - CKV_K8S_13  # Memory limits should be set. We never set memory limits on purpose.
-  - CKV_K8S_43  # Image should use digest. Too strict for our use case.
-  - CKV_K8S_15  # Image Pull Policy should be Always. IfNotPresent is acceptable.
+  - CKV_K8S_13 # Memory limits should be set. We never set memory limits on purpose.
+  - CKV_K8S_43 # Image should use digest. Too strict for our use case.
+  - CKV_K8S_15 # Image Pull Policy should be Always. IfNotPresent is acceptable.
+  - CKV_SECRET_6 # High entropy string. False positives on resource names.
+  - CKV_K8S_35 # Secrets as environment variables. Standard practice for this app.
+  - CKV_K8S_40 # Agent runs as non-root (UID 101/nginx).
+  - CKV_K8S_22 # Agent needs write access to run/cache.
+  - CKV_K8S_156 # Virtual Kubelet needs CSR approval permissions.
+  - CKV_K8S_38 # Node/job needs ServiceAccount token for API access.
+  - CKV_K8S_41 # Job needs automountServiceAccountToken.

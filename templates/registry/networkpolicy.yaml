@@ -1,0 +1,67 @@
+{{- if and .Values.registry.enabled .Values.registry.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "kuack-registry.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kuack-registry.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "kuack-registry.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    {{- if .Values.registry.networkPolicy.ingress }}
+    {{- toYaml .Values.registry.networkPolicy.ingress | nindent 4 }}
+    {{- else }}
+    # Allow ingress from Node pods (for /resolve endpoint)
+    - from:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: kuack-node
+      ports:
+      - protocol: TCP
+        port: {{ .Values.registry.service.port }}
+    # Allow ingress from ingress-nginx namespace (for external browser agents accessing /registry)
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            app.kubernetes.io/name: ingress-nginx
+      ports:
+      - protocol: TCP
+        port: {{ .Values.registry.service.port }}
+    {{- end }}
+  egress:
+    {{- if .Values.registry.networkPolicy.egress }}
+    {{- toYaml .Values.registry.networkPolicy.egress | nindent 4 }}
+    {{- else }}
+    # Allow egress to Valkey (cache)
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: {{ .Release.Namespace }}
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: valkey
+      ports:
+      - protocol: TCP
+        port: 6379
+    # Allow DNS resolution
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+      ports:
+      - protocol: UDP
+        port: 53
+      - protocol: TCP
+        port: 53
+    # Allow HTTPS egress to external OCI registries (any destination)
+    - ports:
+      - protocol: TCP
+        port: 443
+    {{- end }}
+{{- end }}

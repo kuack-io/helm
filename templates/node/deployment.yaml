@@ -6,9 +6,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "kuack-node.labels" . | nindent 4 }}
-  annotations:
-    checkov.io/skip1: CKV_K8S_38=This virtual kubelet requires the service account token to interact with the Kubernetes API for node registration, pod scheduling, and resource management. The token is necessary for the application to function.
-    checkov.io/skip2: CKV_K8S_35=The AGENT_TOKEN secret is used as an environment variable for compatibility with the application's configuration. The token is non-sensitive configuration data, not a high-value secret.
+  labels:
+    {{- include "kuack-node.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.node.podDisruptionBudget.enabled }}
   replicas: 1
@@ -63,6 +62,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        - name: REGISTRY_URL
+          value: "http://{{ include "kuack-registry.fullname" . }}:{{ .Values.registry.service.port }}"
         - name: AGENT_TOKEN
           valueFrom:
             secretKeyRef:

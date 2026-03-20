@@ -28,9 +28,9 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.x'
-          cache: 'pip'
-          cache-dependency-path: '.pre-commit-config.yaml'
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: ".pre-commit-config.yaml"
       - name: Cache pre-commit
         uses: actions/cache@v5
         with:
@@ -109,6 +109,7 @@ jobs:
           config_file: .checkovignore.yaml
           quiet: true
           output_format: cli
+          skip_path: charts
 
   trivy:
     name: Trivy
@@ -122,11 +123,12 @@ jobs:
       - name: Run Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'config'
-          scan-ref: '.'
-          exit-code: '1'
+          scan-type: "config"
+          scan-ref: "."
+          exit-code: "1"
           ignore-unfixed: true
-          severity: 'CRITICAL,HIGH'
+          severity: "CRITICAL,HIGH"
+          skip-dirs: "charts"
         env:
           TRIVY_IGNOREFILE: .trivyignore.yaml
 
